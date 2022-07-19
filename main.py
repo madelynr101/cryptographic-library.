@@ -56,7 +56,7 @@ def beginning_textfile(fernet):
 def encrypts(fernet):
     with open("file1.csv", "rb") as file:
         original = file.read()
-    encrypted = fernet.encrypt(original).encode()
+    encrypted = fernet.encrypt(original)
 
     with open("file1.csv", "wb") as encrypted_file:
         encrypted_file.write(encrypted)
@@ -64,7 +64,7 @@ def encrypts(fernet):
 def decrypts(fernet):
     with open("file1.csv", "rb") as enc_file:
         encrypted = enc_file.read()
-    decrypted = fernet.decrypt(encrypted).decode()
+    decrypted = fernet.decrypt(encrypted)
 
     with open("file1.csv", "wb") as dec_file:
         dec_file.write(decrypted)
