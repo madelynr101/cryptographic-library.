@@ -9,17 +9,19 @@ def generate_key():
         key_file.write(key)
     return key
 
-def read():
-    file1 = open("myfile.txt","r") 
-    while True:
-        line = file1.readline()
-        if line == '': break
-        print(line)
+def read(fernet):
+    print("Your encrypted text file is: \n")
+    file1 = open("file1.csv","rb") 
+    info = file1.read()
+    print(info)
     file1.close()   
-    welcome_menu()
+    print("Your decrypted file is: \n")
+    dec_file = decrypts(fernet)
+    print(dec_file)
+    welcome_menu(fernet)
 
-def modify():
-    file1 = open("myfile.txt","w") 
+def modify(fernet):
+    file1 = open("file1.csv","w") 
     print("We are going to input into the text file step by step.")
     print("Continue entering until you are finished.")
     # User enters data until they are finished
@@ -39,20 +41,38 @@ def modify():
             file1.write(str(part))
             file1.write("\n")
         if new.upper() == "Q":
+            encrypts(fernet)
             file1.close()
-            welcome_menu()
+            welcome_menu(fernet)
         else:
             continue 
 
-def encrypt(messages,fernet):
-    encrypted_message = [fernet.encrypt(each_message.encode())
-                        for each_message in messages]
+def beginning_textfile(fernet):
+    file1 = open("file1.csv","w")
+    file1.write("Please modify this file!\n")
+    file1.close()
+    encrypts(fernet)
 
-def decrypt(messages, fernet):
-    decrypted_message = [fernet.decrypt(each_message.decode())
-                        for each_message in messages]
+def encrypts(fernet):
+    with open("file1.csv", "rb") as file:
+        original = file.read()
+    encrypted = fernet.encrypt(original).encode()
 
-def welcome_menu():
+    with open("file1.csv", "wb") as encrypted_file:
+        encrypted_file.write(encrypted)
+
+def decrypts(fernet):
+    with open("file1.csv", "rb") as enc_file:
+        encrypted = enc_file.read()
+    decrypted = fernet.decrypt(encrypted).decode()
+
+    with open("file1.csv", "wb") as dec_file:
+        dec_file.write(decrypted)
+    return dec_file
+
+def welcome_menu(fernet):
+    # generate a text file so we don't run into an error 
+    beginning_textfile(fernet)
     # input validation menu
     while True:
         print("Welcome to the settings menu!")
@@ -62,7 +82,7 @@ def welcome_menu():
         else:
             continue
     if choice1 == 1:
-        read()
+        read(fernet)
     if choice1 == 2:
         while True:
             choice2 = int(input("WARNING! If you choose to modify the file, any original previous contents will be erased. Would you like to continue? 1 for yes, 2 for no\n"))
@@ -71,7 +91,7 @@ def welcome_menu():
             else:
                 continue
         if choice2 == 1:
-            modify()
+            modify(fernet)
         if choice2 == 2:
             welcome_menu()
     if choice1 == 3:    
@@ -80,9 +100,9 @@ def welcome_menu():
 
 
 def main():
-    welcome_menu()
-    key = generate_key()
+    key = generate_key() 
     fernet = Fernet(key)
+    welcome_menu(fernet)
 
 if __name__ == "__main__":
     main()
